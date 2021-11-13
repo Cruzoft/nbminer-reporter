@@ -2,10 +2,10 @@ package main
 
 // Import resty into your code and refer it as `resty`.
 import (
-    log "github.com/sirupsen/logrus"
-
-    "net/http"
+	"net/http"
     "io/ioutil"
+
+    log "github.com/sirupsen/logrus"
 )
 
 /*

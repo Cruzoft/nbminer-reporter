@@ -13,4 +13,7 @@ func main() {
 		log.Printf("Found Device %s in pcie %i.", device.Info, device.PCIBusId)
 	}
 	log.Printf("Total Hashrate: %s.", status.Miner.TotalHashrate)
+	log.Printf("Parsing to Influx line")
+
+	writeToInflux(status)
 }

@@ -52,6 +52,8 @@ type minerStatus struct {
 		URL2 string `json:"url2"`
 		UseSSL bool `json:"use_ssl"`
 		UseSSL2 bool `json:"use_ssl2"`
+		User string `json:"user"`
+		User2 string `json:"user2"`
 	} `json:"stratum"`
 	Version string  `json:"version"`
 }
