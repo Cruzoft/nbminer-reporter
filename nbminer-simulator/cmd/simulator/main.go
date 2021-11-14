@@ -1,16 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"math/rand"
 )
 
 func main() {
 	
 	statusHandler := func(w http.ResponseWriter, req *http.Request) {
 		log.Println("[INFO] Status report")
-		io.WriteString(w, `{
+		io.WriteString(w, fmt.Sprintf(`{
 	"miner": {
 		"devices": [
 			{
@@ -23,8 +25,8 @@ func main() {
 				"fidelity2": 0,
 				"hashrate": "217.1 M",
 				"hashrate2": "36.19 M",
+				"hashrate_raw": %v,
 				"hashrate2_raw": 36190716.266428046,
-				"hashrate_raw": 217144297.59856823,
 				"id": 0,
 				"info": "GeForce RTX 2070",
 				"mem_clock": 6801,
@@ -45,8 +47,8 @@ func main() {
 				"fidelity2": 0,
 				"hashrate": "168.5 M",
 				"hashrate2": "42.11 M",
+				"hashrate_raw": %v,
 				"hashrate2_raw": 42113955.19774488,
-				"hashrate_raw": 168455820.79097953,
 				"id": 1,
 				"info": "P102-100",
 				"mem_clock": 5508,
@@ -86,7 +88,9 @@ func main() {
 	},
 	"version": "30.0"
 }
-`)
+`,
+(rand.Float32() * 5) + 180,
+(rand.Float32() * 5) + 180))
 	}
 
 	http.HandleFunc("/api/v1/status", statusHandler)

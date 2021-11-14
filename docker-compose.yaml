@@ -1,0 +1,21 @@
+version: "3.9"
+    
+services:
+  simulator:
+    build: 
+      context: ./nbminer-simulator
+    ports:
+      - "8000:8000"
+
+  influxdb:
+    image: influxdb:2.1-alpine
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=miner
+      - DOCKER_INFLUXDB_INIT_PASSWORD=minerpass
+      - DOCKER_INFLUXDB_INIT_ORG=nlsrig
+      - DOCKER_INFLUXDB_INIT_BUCKET=mainr
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=shhh-secret-token
