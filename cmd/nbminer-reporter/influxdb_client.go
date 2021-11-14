@@ -15,6 +15,7 @@ func writeToInflux(status minerStatus) (error) {
 	timestamp := time.Now()
 	
     // create new client with default option for server url authenticate by token
+	//client := influxdb2.NewClient("https://041465c0-7119-41ae-9b93-f9821faadb9d.rig-status-test-6964.influxdb.dbs.scalingo.com:32327/rig_status_test_6964", "testmin:testm1npass")
     client := influxdb2.NewClient("http://host.docker.internal:8086", "shhh-secret-token")
     // user blocking write client for writes to desired bucket
     writeAPI := client.WriteAPI("nlsrig", "mainr")
