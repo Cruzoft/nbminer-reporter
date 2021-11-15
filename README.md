@@ -17,5 +17,5 @@ docker run --rm -it --name nbreporter \
 Run the go app inside the container
 
 ```bash
-go run ./cmd/nbminer-reporter/... -n rig03 -s host.docker.internal -t shhh-secret-token -f 5 -h host.docker.internal
+go run ./cmd/nbminer-reporter/... -n rig03-sim -s host.docker.internal -t shhh-secret-token -f 5 -h host.docker.internal
 ```

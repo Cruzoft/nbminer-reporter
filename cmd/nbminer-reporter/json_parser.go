@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 )
 
+/*
+	An struct that represents the JSon object returned by NBMiner Status endpoint
+	Based on NBMiner v39.7
+*/
 type minerStatus struct {
 	Miner struct {
 		Devices []struct {
@@ -21,6 +25,8 @@ type minerStatus struct {
 			HashrateRaw float32 `json:"hashrate_raw"`
 			Id int `json:"id"`
 			Info string `json:"info"`
+			InvalidShares int `json:"invalid_shares"`
+			MemTemperature int `json:"memTemperature"`
 			MemClock int `json:"mem_clock"`
 			MemUtilization int `json:"mem_utilization"`
 			PCIBusId int `json:"pci_bus_id"`
@@ -44,8 +50,12 @@ type minerStatus struct {
 		Difficulty string `json:"difficulty"`
 		Difficulty2 string `json:"difficulty2"`
 		DualMine bool `json:"dual_mine"`
+		InvalidShares int `json:"invalid_shares"`
 		Latency int `json:"latency"`
 		Latency2 int `json:"latency2"`
+		PoolHashrate10m string `json:"pool_hashrate_10m"`
+		PoolHashrate4h string `json:"pool_hashrate_4h"`
+		PoolHashrate24h string `json:"pool_hashrate_24h"`
 		RejectedShares int `json:"rejected_shares"`
 		RejectedShares2 int `json:"rejected_shares2"`
 		URL string `json:"url"`
@@ -58,13 +68,19 @@ type minerStatus struct {
 	Version string  `json:"version"`
 }
 
+/*
+	Parses the json string returned by NBMiner status endpoint into a struct object
+*/
 func parseStatus(statusData []byte) (minerStatus, error) {
 
 	var status minerStatus
 
+	// Tries to unmarshal the Json data into a struct object
+	//   if an error occurs, it returns nil and the error message
 	if err := json.Unmarshal(statusData, &status); err != nil {
-		return status, fmt.Errorf("Couldn't parse the json response.\nJson: %s \n Previous Error: %v",string(statusData), err)
+		return status, fmt.Errorf("Couldn't parse the status json.\n Received Json: %s \n Previous Error: %v",string(statusData), err)
     }
 
+	// Returns the status struct object
 	return status, nil
 }

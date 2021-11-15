@@ -1,27 +1,30 @@
 package main
 
-// Import resty into your code and refer it as `resty`.
 import (
 	"net/http"
     "io/ioutil"
-
-    log "github.com/sirupsen/logrus"
 )
 
 /*
-
+    Runs a GET HTTP request and returns the response as a byte slice
 */
-func requestGet(host string) (result []byte)/*(result string, statusCode int, status string)*/ {
+func requestGet(host string) ([]byte, error) {
+    // Execute the HTTP request
     response, err := http.Get(host)
 
+    // If error occurs, stop and report it
     if err != nil {
-        log.Println(err)
+        return nil, err
     }
 
+    // Read the response body data
     responseData, err := ioutil.ReadAll(response.Body)
+
+    // If error occurs, stop and report it
     if err != nil {
-        log.Fatalln(err)
+        return nil, err
     }
     
-	return responseData
+    // Finally, if no error occurs, return the body data
+	return responseData, nil
 }

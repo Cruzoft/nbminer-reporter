@@ -8,10 +8,26 @@ services:
       - "8000:8000"
 
   influxdb:
-    image: influxdb:2.1-alpine
+    image: influxdb:1.8.10-alpine
     ports:
       - "8086:8086"
     environment:
+      - INFLUXDB_DB=miner
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=miner
+      - DOCKER_INFLUXDB_INIT_PASSWORD=minerpass
+      - DOCKER_INFLUXDB_INIT_ORG=miner-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=miner
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=shhh-secret-token
+  
+  chronograf:
+    image: chronograf:1.6-alpine
+    command: --influxdb-url=http://influxdb:8086
+    ports:
+      - "8888:8888"
+    environment:
+      - INFLUXDB_DB=miner
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=miner
       - DOCKER_INFLUXDB_INIT_PASSWORD=minerpass

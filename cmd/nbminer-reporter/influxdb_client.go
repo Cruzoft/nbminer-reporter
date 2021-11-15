@@ -10,22 +10,26 @@ import (
     log "github.com/sirupsen/logrus"
 )
 
+/*
+	It takes a NBMiner status object, creates an InfluxDB data point
+		and writes it into a remote InfluxDB service.
+*/
 func writeToInflux(status minerStatus) (error) {
 
 	measurement := "miner-device-status"
 	timestamp := time.Now()
 	
     // create new client with default option for server url authenticate by token
-	//client := influxdb2.NewClient("https://041465c0-7119-41ae-9b93-f9821faadb9d.rig-status-test-6964.influxdb.dbs.scalingo.com:32327/rig_status_test_6964", "testmin:testm1npass")
-    client := influxdb2.NewClient(fmt.Sprintf("http://%s:%v", *optInfluxHost, *optInfluxPort), *optInfluxToken)
+	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), *optInfluxToken)
     // user blocking write client for writes to desired bucket
-    writeAPI := client.WriteAPI(*optInfluxOrg, *optInfluxBucket)
+    writeAPI := influxClient.WriteAPI(*optInfluxOrg, *optInfluxBucket)
 	// Get errors channel
     errorsCh := writeAPI.Errors()
     // Create go proc for reading and logging errors
     go func() {
         for err := range errorsCh {
-            log.Printf("Write error: %s\n", err.Error())
+            log.Error("Something when wrong while trying to send data to InfluxDB.")
+            log.Errorf("Write error: %s\n", err.Error())
         }
     }()
 
@@ -56,8 +60,12 @@ func writeToInflux(status minerStatus) (error) {
 			"difficulty": status.Stratum.Difficulty,
 			"difficulty2": status.Stratum.Difficulty2,
 			"dual_mine": status.Stratum.DualMine,
+			"invalid_shares": status.Stratum.InvalidShares,
 			"latency": status.Stratum.Latency,
 			"latency2": status.Stratum.Latency2,
+			"pool_hashrate_10m": status.Stratum.PoolHashrate10m,
+			"pool_hashrate_4h": status.Stratum.PoolHashrate4h,
+			"pool_hashrate_24h": status.Stratum.PoolHashrate24h,
 			"rejected_shares": status.Stratum.RejectedShares,
 			"rejected_shares2": status.Stratum.RejectedShares2,
 			"url": status.Stratum.URL,
@@ -77,6 +85,8 @@ func writeToInflux(status minerStatus) (error) {
 			"hashrate2": device.Hashrate2,
 			"hashrate_raw": device.HashrateRaw,
 			"hashrate2_raw": device.Hashrate2Raw,
+			"device_invalid_shares": device.InvalidShares,
+			"mem_temperature": device.MemTemperature,
 			"mem_clock": device.MemClock,
 			"mem_utilization": device.MemUtilization,
 			"power": device.Power,
@@ -85,18 +95,19 @@ func writeToInflux(status minerStatus) (error) {
 			"temperature": device.Temperature,
 		}
 		// create point using full params constructor
-		p := influxdb2.NewPoint(measurement,
+		dataPoint := influxdb2.NewPoint(measurement,
 			tags,
 			fields,
 			timestamp)
 		// write point immediately
-		writeAPI.WritePoint(p)
+		writeAPI.WritePoint(dataPoint)
 	}
 
     // Force all unwritten data to be sent
     writeAPI.Flush()
     // Ensures background processes finish
-    client.Close()
+    influxClient.Close()
 
+	// Since everything when will, we return no error
 	return nil
 }

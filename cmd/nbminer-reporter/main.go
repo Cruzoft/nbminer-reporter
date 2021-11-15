@@ -11,54 +11,88 @@ import (
 	getopt "github.com/pborman/getopt"
 )
 
-var optFriendlyName = getopt.StringLong("name", 'n', "a-miner", "A friendly name for miner.")
+var hostname, _ = os.Hostname()
+var optFriendlyName = getopt.StringLong("name", 'n', hostname, "A friendly name for miner. Default: hostname")
 var optNBMinerHost = getopt.StringLong("nbhost", 's', "localhost", "NBMiner API Host. Default: localhost")
 var optNBMinerPort = getopt.IntLong("nbport", 'r', 8000, "NBMiner API Port. Default: 8000")
+var optInfluxProto = getopt.StringLong("iproto", 'l', "http", "InfluxDB Protocol. Default: http")
 var optInfluxHost = getopt.StringLong("ihost", 'h', "localhost", "InfluxDB Host. Default: localhost")
 var optInfluxPort = getopt.IntLong("iport", 'p', 8086, "InfluxDB Port. Default: 8086")
 var optInfluxToken = getopt.StringLong("itoken", 't', "", "InfluxDB Access Token.")
 var optInfluxOrg = getopt.StringLong("iorg", 'o', "miner-org", "InfluxDB Organization. Default: miner-org")
 var optInfluxBucket = getopt.StringLong("ibucket", 'b', "miner", "InfluxDB Bucket. Default: miner")
 var optCheckFrequency = getopt.IntLong("freq", 'f', 300, "Status check frequency in seconds. Default: 300")
-var optHelp = getopt.BoolLong("help", 0, "Help")
+var optVerbose = getopt.Bool('v', "Run in Verbose mode. Default: false")
+var optHelp = getopt.BoolLong("help", 0, "Show usage options.")
 
-func checkMinerStatus() {
-	//statusData := requestGet("http://host.docker.internal:8000/api/v1/status")
-	statusData := requestGet(fmt.Sprintf("http://%s:%v/api/v1/status", *optNBMinerHost, *optNBMinerPort))
-	status, _ := parseStatus(statusData)
 
-	for _, device := range status.Miner.Devices {
-		log.Printf("Found Device %s in pcie %v.", device.Info, device.PCIBusId)
-	}
-	log.Printf("Total Hashrate: %s.", status.Miner.TotalHashrate)
-	
-	writeToInflux(status)
-	log.Printf("Influx line sent")
-}
-
-func WaitForCtrlC() {
-    var end_waiter sync.WaitGroup
-    end_waiter.Add(1)
-    var signal_channel chan os.Signal
-    signal_channel = make(chan os.Signal, 1)
-    signal.Notify(signal_channel, os.Interrupt)
-    go func() {
-		<-signal_channel
-        end_waiter.Done()
-    }()
-    end_waiter.Wait()
-}
-
-func main() {
-    getopt.Parse()
+func init() {
+	getopt.Parse()
 
     if *optHelp {
         getopt.Usage()
         os.Exit(0)
     }
 
+	if (*optVerbose) {
+		log.SetLevel(log.DebugLevel)
+        log.Warn("Log level set to DEBUG")
+	}
+}
+/*
+	This is the process main logic
+	It does a GET request to NBMiner status endpoint, then parses the response body Json to a Struct object
+	and finally it sends its data to InfluxDB
+
+	If anything goes wrong, it's raise an error on the console output, but the process won't stop.
+	This is meant to be like this so it can overcome an internet connection issue, or a miner reboot.
+*/
+func checkMinerStatus() {
+	log.Printf("Checking Status.")
+	// Gets the Miner status data from the endpoint.
+	log.Debug("Running GET request to miner status endpoint")
+	statusData, err := requestGet(fmt.Sprintf("http://%s:%v/api/v1/status", *optNBMinerHost, *optNBMinerPort))
+	if err != nil {
+		log.Error("Something occurred while trying to get status from miner.")
+		log.Error(err)
+		return
+	}
+	
+	log.Debug("Parsing miner status json")
+	// Parses the data into a struct object
+	status, err := parseStatus(statusData)
+	if err != nil {
+		log.Error("Something occurred while trying to parse status from miner.")
+		log.Error(err)
+		return
+	}
+	// Sends the data to InfluxDB
+	log.Debug("Sending data to InfluxDB")
+	writeToInflux(status)
+	log.Debug("Data sent")
+}
+
+func waitTerminationSignal() {
+    var endWaiter sync.WaitGroup
+    var signalChannel chan os.Signal
+    
+	endWaiter.Add(1)
+    signalChannel = make(chan os.Signal, 1)
+    signal.Notify(signalChannel, os.Interrupt)
+    
+	go func() {
+		<-signalChannel
+        endWaiter.Done()
+    }()
+    
+	endWaiter.Wait()
+}
+
+func main() {
     log.Printf("NBMiner Status Reporter Initiated")
     log.Printf("Using Friendly Name: %s", *optFriendlyName)
+
+	// Starting running loop
 	ticker := time.NewTicker(time.Second * time.Duration(*optCheckFrequency))
 	go func() {
 		for range ticker.C {
@@ -66,6 +100,6 @@ func main() {
 		}
 	}()
 
-	WaitForCtrlC()
+	waitTerminationSignal()
 	log.Printf("Termination Signal Detected.")
 }
