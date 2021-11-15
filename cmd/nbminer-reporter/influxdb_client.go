@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
     "time"
@@ -16,22 +17,22 @@ func writeToInflux(status minerStatus) (error) {
 	
     // create new client with default option for server url authenticate by token
 	//client := influxdb2.NewClient("https://041465c0-7119-41ae-9b93-f9821faadb9d.rig-status-test-6964.influxdb.dbs.scalingo.com:32327/rig_status_test_6964", "testmin:testm1npass")
-    client := influxdb2.NewClient("http://host.docker.internal:8086", "shhh-secret-token")
+    client := influxdb2.NewClient(fmt.Sprintf("http://%s:%v", *optInfluxHost, *optInfluxPort), *optInfluxToken)
     // user blocking write client for writes to desired bucket
-    writeAPI := client.WriteAPI("nlsrig", "mainr")
+    writeAPI := client.WriteAPI(*optInfluxOrg, *optInfluxBucket)
 	// Get errors channel
     errorsCh := writeAPI.Errors()
     // Create go proc for reading and logging errors
     go func() {
         for err := range errorsCh {
-            log.Printf("write error: %s\n", err.Error())
+            log.Printf("Write error: %s\n", err.Error())
         }
     }()
 
 	for _, device := range status.Miner.Devices {
 		tags := map[string]string{
 			// Common Tags
-			"friendlyName": "rig03",
+			"friendlyName": *optFriendlyName,
 			"user": status.Stratum.User[strings.LastIndex(status.Stratum.User, ".")+1:], // We don't want to store any wallet addresses 
 			"user2": status.Stratum.User2[strings.LastIndex(status.Stratum.User2, ".")+1:], // We don't want to store any wallet addresses 
 			// Device Tags
