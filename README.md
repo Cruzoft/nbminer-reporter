@@ -81,7 +81,7 @@ Check the options details.
 | Short Flag | Long Flag | Description                                     |
 |----|-------------------|-------------------------------------------------|
 | -n | --name=string     | A friendly name for miner. Default: hostname    |
-| -f | --freq=number     | Status check frequency in seconds. Default: 300 |
+| -f | --freq=number     | Status check frequency in seconds. Default: 60  |
 | -h | --ihost=string    | InfluxDB Host.  Default: localhost              |
 | -p | --iport=number    | InfluxDB Port. Default: 8086                    |
 | -t | --itoken=string   | InfluxDB Access Token.                          |
