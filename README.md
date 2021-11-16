@@ -80,18 +80,18 @@ Check the options details.
 
 | Short Flag | Long Flag | Description                                     |
 |----|-------------------|-------------------------------------------------|
-|    | --help            | Show usage options.                             |
-| -b | --ibucket=string  | InfluxDB Bucket. Default: miner                 |
+| -n | --name=string     | A friendly name for miner. Default: hostname    |
 | -f | --freq=number     | Status check frequency in seconds. Default: 300 |
 | -h | --ihost=string    | InfluxDB Host.  Default: localhost              |
-| -l | --iproto=string   | InfluxDB Protocol.  Default: http               |
-| -n | --name=string     | A friendly name for miner. Default: hostname    |
-| -o | --iorg=string     | InfluxDB Organization.  Default: miner-org      |
 | -p | --iport=number    | InfluxDB Port. Default: 8086                    |
+| -t | --itoken=string   | InfluxDB Access Token.                          |
+| -l | --iproto=string   | InfluxDB Protocol.  Default: http               |
+| -b | --ibucket=string  | InfluxDB Bucket. Default: miner                 |
+| -o | --iorg=string     | InfluxDB Organization.  Default: miner-org      |
 | -r | --nbport=number   | NBMiner API Port. Default: 8000                 |
 | -s | --nbhost=string   | NBMiner API Host. Default: localhost            |
-| -t | --itoken=string   | InfluxDB Access Token.                          |
 | -v |                   | Run in Verbose mode. Default: false             |
+|    | --help            | Show usage options.                             |
 
 ## Compatibility
 
