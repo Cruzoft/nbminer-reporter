@@ -47,7 +47,7 @@ That's it, you're ready to continue with NBMiner Reporter installation.
     INFO[0005] Checking Status.                   
     ```
 
-That's it, you're now sending you miner status to InfluxDB.
+That's it, you're now sending your miner status to InfluxDB.
 
 ### On Linux
 
@@ -66,11 +66,11 @@ That's it, you're now sending you miner status to InfluxDB.
     INFO[0005] Checking Status.                   
     ```
 
-That's it, you're now sending you miner status to InfluxDB.
+That's it, you're now sending your miner status to InfluxDB.
 
 ## CMD Options
 
-Customize the way NBMiner works by using the following options:
+Customize the way NBMiner Reporter works by using the following options:
 
 ```bash
 nbreporter [-v] [-b string] [-f number] [--help] [-h string] [-l string] [-n string] [-o string] [-p number] [-r strinumberng] [-s string] [-t string]
