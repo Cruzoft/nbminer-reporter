@@ -19,7 +19,7 @@ This app assumes your NBMiner is exposing status data through its REST API. If y
 
     What this flag does is enabling a REST API that exposes the miner status data, such as temp or hasrates.
 
-    You can check all the info at NBMiner official docs: [here](https://github.com/NebuTech/NBMiner#cmd-options).
+    You can check all the info at NBMiner official docs: [here](https://github.com/NebuTech/NBMiner#api-reference).
 
     **IMPORTANT**: This API does exposes your wallet id, but is still only accessible from machine. NBMiner Reporter WON'T send the wallet id to InfluxDB, that's the only field ignored while sending the data.
 
@@ -103,24 +103,42 @@ NBMiner Reporter has been tested using the following setups:
 
 ## Contribute
 
-Get a local influx and nbminer simulator
+### Local Build
 
-```bash
-docker-compose up
-```
+To work on your local machine, and build the go app, we recommend using a docker container, so you don't have to install GO SDK if you don't have it, and ensure you have a clean environment to work with.
 
-Run the dev container
+1. Fork this repo, and clone it in your computer.
+1. Open a terminal, and move to the repository folder.
+1. Use this command to start the container:
 
-```bash
-docker run --rm -it --name nbreporter \
--v `pwd`:/src -w /src golang:1.17.3-alpine3.14 sh
-```
+    ```sh
+    docker run --rm -it --name nbreporter -v `pwd`:/src -w /src golang:1.17.3-alpine3.14 sh
+    ```
 
-Run the go app inside the container
+1. Once on the container, build the app by running  `go build ./cmd/nbreporter/...`
 
-```bash
-go run ./cmd/nbminer-reporter/... -n rig03-sim -s host.docker.internal -t shhh-secret-token -f 5 -h host.docker.internal
-```
+### Developing locally
 
-GOOS=windows GOARCH=amd64 go build -o bin/app-amd64.exe app.go
-nbreporter -n rig03 -l https -h influxdb-miner.orion.net.ar -p 443
+Now you have your app built, you need to be able to run it. This app takes data from a REST API, and sends it to an InfluxDB service, so in order to be able to test it, you'll need both services accessibe from the development machine.
+
+Worry not, you won't need to access an actual miner rig, we got you covered. We've created a NBMiner Status Simulator, basically a very simple web app that exposes the same REST API as the NBMiner, but with random numbers. Enough for develpment and testing right? Also, we've set it up on a docker-compose file with an InfluxDB service to use.
+
+1. Build the simulator image locally:
+
+    ```sh
+    docker-compose build
+    ```
+
+1. Start the services:
+
+    ```sh
+    docker-compose up
+    ```
+
+1. Back on your development container, run the app:
+
+    ```sh
+    go run ./cmd/nbreporter/... -s host.docker.internal -t shhh-secret-token -f 5 -h host.docker.internal
+    ```
+
+1. Go to your browser and point it to http://localhost:8888. You should see a Cronograf UI wich you can use to query InfluxDB and check the data points.
