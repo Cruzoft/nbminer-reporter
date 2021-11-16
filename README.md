@@ -1,5 +1,5 @@
-# nbminer-reporter
-A simple app that reads NBMiner status REST API data and sends it to InfluxDB.
+# NBMiner Reporter
+A simple Go app that reads NBMiner status REST API data and sends it to InfluxDB.
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Cruzoft/nbminer-reporter/cicd)
 ![GitHub go.mod Go version (branch & subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/Cruzoft/nbminer-reporter/main?label=Go%20Version)
@@ -9,9 +9,26 @@ A simple app that reads NBMiner status REST API data and sends it to InfluxDB.
 
 Using the reporter is quite easy, specially if you've already setup NBMiner before.
 
+### Before you start
+
+This app assumes your NBMiner is exposing status data through its REST API. If you haven't enable it, follow these simple steps:
+
+1. Go NBMiner folder.
+1. Open and edit the file you execute to start the miner (the one that has your wallet id in it).
+1. At the end of the line, add the following flag `--api 127.0.0.1`.
+
+    What this flag does is enabling a REST API that exposes the miner status data, such as temp or hasrates.
+
+    You can check all the info at NBMiner official docs: [here](https://github.com/NebuTech/NBMiner#cmd-options).
+
+
+
+1. Save and close the file, and now restart the miner.
+1. Let's check the API is working. Open a web browser, and go to http://localhost:8000.
+
 ### On Windows
 
-1. Get the **Windows** files from the latests release: [Download Now](https://github.com/NebuTech/NBMiner/releases)
+1. Get the **Windows** files from the latests release: [Download Now](https://github.com/Cruzoft/nbminer-reporter/releases)
 1. Unzip the file on a separated folder than NBMiner.
 1. Edit the `start_win_nbreporter.bat` file:
     1. Change `rigX` with the friendly name you want your miner to be called
