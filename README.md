@@ -19,3 +19,6 @@ Run the go app inside the container
 ```bash
 go run ./cmd/nbminer-reporter/... -n rig03-sim -s host.docker.internal -t shhh-secret-token -f 5 -h host.docker.internal
 ```
+
+GOOS=windows GOARCH=amd64 go build -o bin/app-amd64.exe app.go
+nbreporter -n rig03 -l https -h influxdb-miner.orion.net.ar -p 443
