@@ -1,5 +1,5 @@
 # NBMiner Reporter
-A simple Go app that reads NBMiner status REST API data and sends it to InfluxDB.
+A simple Go app that reads [NBMiner](https://github.com/NebuTech/NBMiner#nbminer) status REST API data and sends it to InfluxDB.
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Cruzoft/nbminer-reporter/cicd)
 ![GitHub go.mod Go version (branch & subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/Cruzoft/nbminer-reporter/main?label=Go%20Version)
