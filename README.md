@@ -21,7 +21,7 @@ This app assumes your NBMiner is exposing status data through its REST API. If y
 
     You can check all the info at NBMiner official docs: [here](https://github.com/NebuTech/NBMiner#api-reference).
 
-    **IMPORTANT**: This API does exposes your wallet id, but is still only accessible from machine. NBMiner Reporter WON'T send the wallet id to InfluxDB, that's the only field ignored while sending the data.
+    **IMPORTANT**: This API does exposes your wallet id, but is still only accessible from the machine. NBMiner Reporter WON'T send the wallet id to InfluxDB, that's the only field ignored while sending the data.
 
 1. Save and close the file, and now restart the miner.
 1. Let's check the API is working. Open a web browser, and go to http://localhost:8000.
