@@ -36,4 +36,4 @@ jobs:
           project_path: "./cmd/nbminer-reporter"
           binary_name: "nbreporter"
           ldflags: "-s -w"
-          extra_files: LICENSE Readme.md scripts/start_lnx_nbreporter.sh scripts/start_win_nbreporter.bat
+          extra_files: LICENSE README.md scripts/start_lnx_nbreporter.sh scripts/start_win_nbreporter.bat
