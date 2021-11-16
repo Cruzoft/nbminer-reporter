@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: release
 
 # Controls when the action will run. 
@@ -27,13 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: go test -v -p=1 -timeout=0 ./cmd/nbminer-reporter/...
+        run: go test -v -p=1 -timeout=0 ./cmd/nbreporter/...
       - uses: wangyoucao577/go-release-action@v1.20
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          project_path: "./cmd/nbminer-reporter"
+          project_path: "./cmd/nbreporter"
           binary_name: "nbreporter"
           ldflags: "-s -w"
           extra_files: LICENSE README.md scripts/start_lnx_nbreporter.sh scripts/start_win_nbreporter.bat
