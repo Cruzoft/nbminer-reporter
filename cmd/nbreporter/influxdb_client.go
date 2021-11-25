@@ -16,8 +16,8 @@ import (
 */
 func writeToInflux(status minerStatus) (error) {
 
-	measurement := "miner-device-status"
-	timestamp := time.Now()
+	measurement := "   "
+	timestamp := time.Now().Round(time.Duration(*optCheckFrequencyRound) * time.Second)
 	
     // create new client with default option for server url authenticate by token
 	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), *optInfluxToken)
