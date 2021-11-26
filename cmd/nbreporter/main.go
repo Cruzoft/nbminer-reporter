@@ -22,6 +22,7 @@ var optInfluxToken = getopt.StringLong("itoken", 't', "", "InfluxDB Access Token
 var optInfluxOrg = getopt.StringLong("iorg", 'o', "miner-org", "InfluxDB Organization. \nDefault: miner-org", "string")
 var optInfluxBucket = getopt.StringLong("ibucket", 'b', "miner", "InfluxDB Bucket. \nDefault: miner", "string")
 var optCheckFrequency = getopt.IntLong("freq", 'f', 60, "Status check frequency in seconds.\nDefault: 60", "number")
+var optCheckFrequencyRound = getopt.IntLong("round", 'd', 1, "Round up the status timestamp seconds.\nDefault: 1", "seconds")
 var optVerbose = getopt.Bool('v', "Run in Verbose mode. \nDefault: false", "string")
 var optHelp = getopt.BoolLong("help", 0, "Show usage options.")
 

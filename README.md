@@ -73,25 +73,26 @@ That's it, you're now sending your miner status to InfluxDB.
 Customize the way NBMiner Reporter works by using the following options:
 
 ```bash
-nbreporter [-v] [-b string] [-f number] [--help] [-h string] [-l string] [-n string] [-o string] [-p number] [-r strinumberng] [-s string] [-t string]
+nbreporter [-v] [-b string] [-f number] [-d number] [-h string] [-l string] [-n string] [-o string] [-p number] [-r strinumberng] [-s string] [-t string] [--help]
 ```
 
 Check the options details.
 
-| Short Flag | Long Flag | Description                                     |
-|----|-------------------|-------------------------------------------------|
-| -n | --name=string     | A friendly name for miner. Default: hostname    |
-| -f | --freq=number     | Status check frequency in seconds. Default: 60  |
-| -h | --ihost=string    | InfluxDB Host.  Default: localhost              |
-| -p | --iport=number    | InfluxDB Port. Default: 8086                    |
-| -t | --itoken=string   | InfluxDB Access Token.                          |
-| -l | --iproto=string   | InfluxDB Protocol.  Default: http               |
-| -b | --ibucket=string  | InfluxDB Bucket. Default: miner                 |
-| -o | --iorg=string     | InfluxDB Organization.  Default: miner-org      |
-| -r | --nbport=number   | NBMiner API Port. Default: 8000                 |
-| -s | --nbhost=string   | NBMiner API Host. Default: localhost            |
-| -v |                   | Run in Verbose mode. Default: false             |
-|    | --help            | Show usage options.                             |
+| Short Flag | Long Flag | Description                                          |
+|----|-------------------|------------------------------------------------------|
+| -n | --name=string     | A friendly name for miner. Default: hostname         |
+| -f | --freq=number     | Status check frequency in seconds. Default: 60       |
+| -d | --round=number    | Round up the status timestamp seconds. Default: 1    |
+| -h | --ihost=string    | InfluxDB Host.  Default: localhost                   |
+| -p | --iport=number    | InfluxDB Port. Default: 8086                         |
+| -t | --itoken=string   | InfluxDB Access Token.                               |
+| -l | --iproto=string   | InfluxDB Protocol.  Default: http                    |
+| -b | --ibucket=string  | InfluxDB Bucket. Default: miner                      |
+| -o | --iorg=string     | InfluxDB Organization.  Default: miner-org           |
+| -r | --nbport=number   | NBMiner API Port. Default: 8000                      |
+| -s | --nbhost=string   | NBMiner API Host. Default: localhost                 |
+| -v |                   | Run in Verbose mode. Default: false                  |
+|    | --help            | Show usage options.                                  |
 
 ## Compatibility
 
@@ -99,7 +100,7 @@ NBMiner Reporter has been tested using the following setups:
 
 | NBM Reporter Ver. | NBMiner Vers. | OS                 | InfluxDB             |
 |-------------------|---------------|--------------------|----------------------|
-| v1.0.X            | 39.7          | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
+| v1.0.X            | 39.7 - 40.1   | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
 
 ## Contribute
 
