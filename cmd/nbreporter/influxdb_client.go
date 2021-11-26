@@ -1,14 +1,29 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
     "time"
 
-    "github.com/influxdata/influxdb-client-go/v2"
     log "github.com/sirupsen/logrus"
+    influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/domain"
 )
+
+func checkInfluxHealth() (error) {
+	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), token)
+	health, err := influxClient.Health(context.Background())
+	
+	if err != nil {
+		log.Error("Couldn't check InfluxDB Health.")
+		return err
+	} 
+	
+	log.Infof("InfluxDB Version: %s", *domain.HealthCheck(*health).Version)
+	return nil
+}
 
 /*
 	It takes a NBMiner status object, creates an InfluxDB data point
@@ -20,7 +35,7 @@ func writeToInflux(status minerStatus) (error) {
 	timestamp := time.Now().Round(time.Duration(*optCheckFrequencyRound) * time.Second)
 	
     // create new client with default option for server url authenticate by token
-	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), *optInfluxToken)
+	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), token)
     // user blocking write client for writes to desired bucket
     writeAPI := influxClient.WriteAPI(*optInfluxOrg, *optInfluxBucket)
 	// Get errors channel
