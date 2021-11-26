@@ -102,6 +102,13 @@ influx setup \
       -f
 ```
 
+You should get an output like the following:
+
+```
+User	Organization	Bucket
+miner	miner-org	miner
+```
+
 Or, if you have already done InfluxDB setup and just need to add a new organization and bucket:
 
 ```bash
