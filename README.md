@@ -39,7 +39,7 @@ That's it, you're ready to continue with NBMiner Reporter installation.
     2. Change `influxdb.my.organization.net` URL with your InfluxDB server URL.
     3. If you need to set a different InfluxDB port than default, use the option `-p 8080`.
     4. If you need to set a different InfluxDB schema than default, use the option `-l https`.
-    5. If you are using InfluxDB 2 check the [influx setup](#influxdb-2.x) section, and be sure to use the `-t` option to provide the API Token.
+    5. If you are using InfluxDB 2 check the [influx setup](#influxdb-2x) section, and be sure to use the `-t` option to provide the API Token.
 1. Execute `start_win_nbreporter.bat`. A shell window will open, and you should see an output like the following:
 
     ```shell
@@ -59,7 +59,7 @@ That's it, you're now sending your miner status to InfluxDB.
     2. Change `influxdb.my.organization.net` URL with your InfluxDB server URL.
     3. If you need to set a different InfluxDB port than default, use the option `-p 8080`.
     4. If you need to set a different InfluxDB schema than default, use the option `-l https`.
-    5. If you are using InfluxDB 2 check the [influx setup](#influxdb-2.x) section, and be sure to use the `-t` option to provide the API Token.
+    5. If you are using InfluxDB 2 check the [influx setup](#influxdb-2x) section, and be sure to use the `-t` option to provide the API Token.
 1. Execute `start_lnx_nbreporter.sh`. A terminal window will open, and you should see an output like the following:
 
     ```shell
