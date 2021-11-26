@@ -110,6 +110,7 @@ func main() {
 	// Starting running loop
 	ticker := time.NewTicker(time.Second * time.Duration(*optCheckFrequency))
 	go func() {
+		checkMinerStatus()
 		for range ticker.C {
 			checkMinerStatus()
 		}
