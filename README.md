@@ -90,11 +90,30 @@ Be sure to change `localhost:8086` with the host and port of you InfluxDB server
 
 #### InfluxDB 2.X
 
-If you're using InfluxDB *2.X* you just need to create the Organization, and the Bucket. To do so, simply use the [influx](https://docs.influxdata.com/influxdb/v2.1/reference/cli/influx/) cli:
+If you're using InfluxDB *2.X* you just need to create the Organization, and the Bucket. To do so, simply use the [influx](https://docs.influxdata.com/influxdb/v2.1/reference/cli/influx/) cli and the setup command:
 
 ```bash
-influx org create --name miner-org
-influx bucket create --name miner --org miner-org --retention 30d
+influx setup \
+      --username miner \
+      --password miner-pass \
+      --org miner-org \
+      --bucket miner \
+      --retention 4w \
+      -f
+```
+
+You should get an output like the following:
+
+```
+User	Organization	Bucket
+miner	miner-org	miner
+```
+
+Or, if you have already done InfluxDB setup and just need to add a new organization and bucket:
+
+```bash
+influx org create --name miner-org --token <auth_token>
+influx bucket create --name miner --org miner-org --retention 30d  --token <auth_token>
 ```
 
 ## CMD Options
