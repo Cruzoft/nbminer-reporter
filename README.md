@@ -68,6 +68,35 @@ That's it, you're now sending your miner status to InfluxDB.
 
 That's it, you're now sending your miner status to InfluxDB.
 
+### InfluxDB Setup
+
+You have to be sure that the organization and buckets given to NBReporter already exists in InfluxDB before running the app. Here is an example of how to do it.
+
+#### InfluxDB 1.8.X
+
+If you're using InfluxDB *1.8.X* you just need to create the Database. To do so, simply run the following command on Influx:
+
+```sql
+CREATE DATABASE miner WITH DURATION 7d REPLICATION 1 SHARD DURATION 1h
+```
+
+Here is an example to execute it using `curl`:
+
+```bash
+curl -X POST localhost:8086/query --data-urlencode "q=CREATE DATABASE miner WITH DURATION 7d REPLICATION 1 SHARD DURATION 1h"
+```
+
+Be sure to change `localhost:8086` with the host and port of you InfluxDB server.
+
+#### InfluxDB 2.X
+
+If you're using InfluxDB *2.X* you just need to create the Organization, and the Bucket. To do so, simply use the [influx](https://docs.influxdata.com/influxdb/v2.1/reference/cli/influx/) cli:
+
+```bash
+influx org create --name miner-org
+influx bucket create --name miner --org miner-org --retention 30d
+```
+
 ## CMD Options
 
 Customize the way NBMiner Reporter works by using the following options:
@@ -85,10 +114,12 @@ Check the options details.
 | -d | --round=number    | Round up the status timestamp seconds. Default: 1    |
 | -h | --ihost=string    | InfluxDB Host.  Default: localhost                   |
 | -p | --iport=number    | InfluxDB Port. Default: 8086                         |
-| -t | --itoken=string   | InfluxDB Access Token.                               |
 | -l | --iproto=string   | InfluxDB Protocol.  Default: http                    |
-| -b | --ibucket=string  | InfluxDB Bucket. Default: miner                      |
-| -o | --iorg=string     | InfluxDB Organization.  Default: miner-org           |
+| -t | --token=string    | InfluxDB Access Token.                               |
+| -u | --username=string | InfluxDB Username (For v1.8.x).                      |
+| -w | --password=string | InfluxDB Password (For v1.8.x).                      |
+| -b | --bucket=string   | InfluxDB Bucket. Default: miner                      |
+| -o | --org=string      | InfluxDB Organization.  Default: miner-org           |
 | -r | --nbport=number   | NBMiner API Port. Default: 8000                      |
 | -s | --nbhost=string   | NBMiner API Host. Default: localhost                 |
 | -v |                   | Run in Verbose mode. Default: false                  |

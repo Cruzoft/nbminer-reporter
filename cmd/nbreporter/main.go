@@ -18,14 +18,17 @@ var optNBMinerPort = getopt.IntLong("nbport", 'r', 8000, "NBMiner API Port. \nDe
 var optInfluxProto = getopt.StringLong("iproto", 'l', "http", "InfluxDB Protocol. \nDefault: http", "string")
 var optInfluxHost = getopt.StringLong("ihost", 'h', "localhost", "InfluxDB Host. \nDefault: localhost", "string")
 var optInfluxPort = getopt.IntLong("iport", 'p', 8086, "InfluxDB Port. \nDefault: 8086", "number")
-var optInfluxToken = getopt.StringLong("itoken", 't', "", "InfluxDB Access Token.", "string")
-var optInfluxOrg = getopt.StringLong("iorg", 'o', "miner-org", "InfluxDB Organization. \nDefault: miner-org", "string")
-var optInfluxBucket = getopt.StringLong("ibucket", 'b', "miner", "InfluxDB Bucket. \nDefault: miner", "string")
+var optInfluxToken = getopt.StringLong("token", 't', "", "InfluxDB Access Token.", "string")
+var optInfluxUser = getopt.StringLong("username", 'u', "", "InfluxDB Username (For v1.8.x).", "string")
+var optInfluxPass = getopt.StringLong("password", 'w', "", "InfluxDB Password (For v1.8.x).", "string")
+var optInfluxOrg = getopt.StringLong("org", 'o', "miner-org", "InfluxDB Organization. \nDefault: miner-org", "string")
+var optInfluxBucket = getopt.StringLong("bucket", 'b', "miner", "InfluxDB Bucket. \nDefault: miner", "string")
 var optCheckFrequency = getopt.IntLong("freq", 'f', 60, "Status check frequency in seconds.\nDefault: 60", "number")
-var optCheckFrequencyRound = getopt.IntLong("round", 'd', 1, "Round up the status timestamp seconds.\nDefault: 1", "seconds")
+var optCheckFrequencyRound = getopt.IntLong("round", 'd', 1, "Round up the status timestamp seconds.\nDefault: 1", "number")
 var optVerbose = getopt.Bool('v', "Run in Verbose mode. \nDefault: false", "string")
 var optHelp = getopt.BoolLong("help", 0, "Show usage options.")
 
+var token = ""
 
 func init() {
 	getopt.Parse()
@@ -38,6 +41,17 @@ func init() {
 	if (*optVerbose) {
 		log.SetLevel(log.DebugLevel)
         log.Warn("Log level set to DEBUG")
+	}
+
+	token = *optInfluxToken
+	if *optInfluxUser != "" {
+		log.Debug("Using username as password to authenticate on InfluxDB.")
+		token = fmt.Sprintf("%s:%s",*optInfluxUser, *optInfluxPass)
+	}
+
+	healthError := checkInfluxHealth()
+	if healthError != nil {
+		log.Errorf("Health Error: %s", healthError.Error())
 	}
 }
 /*

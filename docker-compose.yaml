@@ -13,6 +13,8 @@ services:
       - "8086:8086"
     environment:
       - INFLUXDB_DB=miner
+      - INFLUXDB_WRITE_USER=miner1
+      - INFLUXDB_WRITE_USER_PASSWORD=miner1-pass
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=miner
       - DOCKER_INFLUXDB_INIT_PASSWORD=minerpass
