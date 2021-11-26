@@ -124,7 +124,7 @@ ID			Description	Token												User Name	User ID			Permissions
 088362ce9ff2b000			8xO2sKCy9LvNnCQBhFbpfCFmcPoTRS0an1_sB8pYJHRAIOD5jEoGZFQFIShOTLyeJs1jryo5zMGLTGhnl__9wg==	miner		088362615672b000	[write:orgs/cc0045af7ecbbcb7/buckets]
 ```
 
-Copy the `token` and pass it to the reporter using the `--token` parameter.
+Copy the `token` and pass it to the reporter using the `-t` option.
 
 Or, if you have already done InfluxDB setup and just need to add a new organization and bucket:
 
