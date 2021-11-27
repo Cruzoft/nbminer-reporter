@@ -39,6 +39,7 @@ That's it, you're ready to continue with NBMiner Reporter installation.
     2. Change `influxdb.my.organization.net` URL with your InfluxDB server URL.
     3. If you need to set a different InfluxDB port than default, use the option `-p 8080`.
     4. If you need to set a different InfluxDB schema than default, use the option `-l https`.
+    5. If you are using InfluxDB 2 check the [influx setup](#influxdb-2x) section, and be sure to use the `-t` option to provide the API Token.
 1. Execute `start_win_nbreporter.bat`. A shell window will open, and you should see an output like the following:
 
     ```shell
@@ -58,6 +59,7 @@ That's it, you're now sending your miner status to InfluxDB.
     2. Change `influxdb.my.organization.net` URL with your InfluxDB server URL.
     3. If you need to set a different InfluxDB port than default, use the option `-p 8080`.
     4. If you need to set a different InfluxDB schema than default, use the option `-l https`.
+    5. If you are using InfluxDB 2 check the [influx setup](#influxdb-2x) section, and be sure to use the `-t` option to provide the API Token.
 1. Execute `start_lnx_nbreporter.sh`. A terminal window will open, and you should see an output like the following:
 
     ```shell
@@ -108,6 +110,21 @@ You should get an output like the following:
 User	Organization	Bucket
 miner	miner-org	miner
 ```
+
+Now create a API token for the reporter
+
+```bash
+influx auth create -o miner-org --write-buckets
+```
+
+You should get an output like this:
+
+```
+ID			Description	Token												User Name	User ID			Permissions
+088362ce9ff2b000			8xO2sKCy9LvNnCQBhFbpfCFmcPoTRS0an1_sB8pYJHRAIOD5jEoGZFQFIShOTLyeJs1jryo5zMGLTGhnl__9wg==	miner		088362615672b000	[write:orgs/cc0045af7ecbbcb7/buckets]
+```
+
+Copy the `token` and pass it to the reporter using the `-t` option.
 
 Or, if you have already done InfluxDB setup and just need to add a new organization and bucket:
 
