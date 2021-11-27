@@ -29,7 +29,7 @@ func checkInfluxHealth() (error) {
 	It takes a NBMiner status object, creates an InfluxDB data point
 		and writes it into a remote InfluxDB service.
 */
-func writeToInflux(status minerStatus) (error) {
+func writeToInflux(status minerStatus, ping int) (error) {
 
 	measurement := "   "
 	timestamp := time.Now().Round(time.Duration(*optCheckFrequencyRound) * time.Second)
@@ -48,67 +48,80 @@ func writeToInflux(status minerStatus) (error) {
         }
     }()
 
-	for _, device := range status.Miner.Devices {
-		tags := map[string]string{
-			// Common Tags
-			"friendlyName": *optFriendlyName,
-			"user": status.Stratum.User[strings.LastIndex(status.Stratum.User, ".")+1:], // We don't want to store any wallet addresses 
-			"user2": status.Stratum.User2[strings.LastIndex(status.Stratum.User2, ".")+1:], // We don't want to store any wallet addresses 
-			// Device Tags
-			"id": strconv.Itoa(device.Id),
-			"pci_bus_id": strconv.Itoa(device.PCIBusId),
-			"info": device.Info,
-		}
+	// Create the tags and fields bars to store all the datapoint values
+	tags := map[string]string{"friendlyName": *optFriendlyName}
+	fields := map[string]interface{}{"ping": ping}
+	
+	if (ping == 1) {
+		// Common Tags
+		tags["friendlyName"] = *optFriendlyName	
+		tags["user"] = status.Stratum.User[strings.LastIndex(status.Stratum.User, ".")+1:] // We don't want to store any wallet addresses 
+		tags["user2"] = status.Stratum.User2[strings.LastIndex(status.Stratum.User2, ".")+1:] // We don't want to store any wallet addresses 
+		// Common Fields
+		fields["total_hashrate"] = status.Miner.TotalHashrate
+		fields["total_hashrate2"] = status.Miner.TotalHashrate2
+		fields["total_hashrate_raw"] = status.Miner.TotalHashrateRaw
+		fields["total_hashrate_raw2"] = status.Miner.TotalHashrateRaw2
+		fields["total_power_consume"] = status.Miner.TotalPowerConsume
+		fields["reboot_times"] = status.RebootTime
+		fields["start_time"] = status.StartTime
+		fields["accepted_shares"] = status.Stratum.AcceptedShares
+		fields["accepted_shares2"] = status.Stratum.AcceptedShares2
+		fields["algorithm"] = status.Stratum.Algorithm
+		fields["difficulty"] = status.Stratum.Difficulty
+		fields["difficulty2"] = status.Stratum.Difficulty2
+		fields["dual_mine"] = status.Stratum.DualMine
+		fields["invalid_shares"] = status.Stratum.InvalidShares
+		fields["latency"] = status.Stratum.Latency
+		fields["latency2"] = status.Stratum.Latency2
+		fields["pool_hashrate_10m"] = status.Stratum.PoolHashrate10m
+		fields["pool_hashrate_4h"] = status.Stratum.PoolHashrate4h
+		fields["pool_hashrate_24h"] = status.Stratum.PoolHashrate24h
+		fields["rejected_shares"] = status.Stratum.RejectedShares
+		fields["rejected_shares2"] = status.Stratum.RejectedShares2
+		fields["url"] = status.Stratum.URL
+		fields["url2"] = status.Stratum.URL2
+		fields["use_ssl"] = status.Stratum.UseSSL
+		fields["use_ssl2"] = status.Stratum.UseSSL2
+		fields["version"] = status.Version
 
-		fields := map[string]interface{}{
-			// Common Fields
-			"total_hashrate": status.Miner.TotalHashrate,
-			"total_hashrate2": status.Miner.TotalHashrate2,
-			"total_hashrate_raw": status.Miner.TotalHashrateRaw,
-			"total_hashrate_raw2": status.Miner.TotalHashrateRaw2,
-			"total_power_consume": status.Miner.TotalPowerConsume,
-			"reboot_times": status.RebootTime,
-			"start_time": status.StartTime,
-			"accepted_shares": status.Stratum.AcceptedShares,
-			"accepted_shares2": status.Stratum.AcceptedShares2,
-			"algorithm": status.Stratum.Algorithm,
-			"difficulty": status.Stratum.Difficulty,
-			"difficulty2": status.Stratum.Difficulty2,
-			"dual_mine": status.Stratum.DualMine,
-			"invalid_shares": status.Stratum.InvalidShares,
-			"latency": status.Stratum.Latency,
-			"latency2": status.Stratum.Latency2,
-			"pool_hashrate_10m": status.Stratum.PoolHashrate10m,
-			"pool_hashrate_4h": status.Stratum.PoolHashrate4h,
-			"pool_hashrate_24h": status.Stratum.PoolHashrate24h,
-			"rejected_shares": status.Stratum.RejectedShares,
-			"rejected_shares2": status.Stratum.RejectedShares2,
-			"url": status.Stratum.URL,
-			"url2": status.Stratum.URL2,
-			"use_ssl": status.Stratum.UseSSL,
-			"use_ssl2": status.Stratum.UseSSL2,
-			"version": status.Version,
+		for _, device := range status.Miner.Devices {
+			// Device Tags
+			tags["id"] = strconv.Itoa(device.Id)
+			tags["pci_bus_id"] = strconv.Itoa(device.PCIBusId)
+			tags["info"] = device.Info
+	
 			// Device Fields
-			"device_accepted_shares": device.AcceptedShares,
-			"device_accepted_shares2": device.AcceptedShares2,
-			"core_clock": device.CoreClock,
-			"core_utilization": device.CoreUtilization,
-			"fan": device.Fan,
-			"fidelity1": device.Fidelity1,
-			"fidelity2": device.Fidelity2,
-			"hashrate": device.Hashrate,
-			"hashrate2": device.Hashrate2,
-			"hashrate_raw": device.HashrateRaw,
-			"hashrate2_raw": device.Hashrate2Raw,
-			"device_invalid_shares": device.InvalidShares,
-			"mem_temperature": device.MemTemperature,
-			"mem_clock": device.MemClock,
-			"mem_utilization": device.MemUtilization,
-			"power": device.Power,
-			"device_rejected_shares": device.RejectedShares,
-			"device_rejected_shares2": device.RejectedShares2,
-			"temperature": device.Temperature,
+			fields["device_accepted_shares"] = device.AcceptedShares
+			fields["device_accepted_shares2"] = device.AcceptedShares2
+			fields["core_clock"] = device.CoreClock
+			fields["core_utilization"] = device.CoreUtilization
+			fields["fan"] = device.Fan
+			fields["fidelity1"] = device.Fidelity1
+			fields["fidelity2"] = device.Fidelity2
+			fields["hashrate"] = device.Hashrate
+			fields["hashrate2"] = device.Hashrate2
+			fields["hashrate_raw"] = device.HashrateRaw
+			fields["hashrate2_raw"] = device.Hashrate2Raw
+			fields["device_invalid_shares"] = device.InvalidShares
+			fields["mem_temperature"] = device.MemTemperature
+			fields["mem_clock"] = device.MemClock
+			fields["mem_utilization"] = device.MemUtilization
+			fields["power"] = device.Power
+			fields["device_rejected_shares"] = device.RejectedShares
+			fields["device_rejected_shares2"] = device.RejectedShares2
+			fields["temperature"] = device.Temperature
+			
+			// create point using full params constructor
+			dataPoint := influxdb2.NewPoint(measurement,
+				tags,
+				fields,
+				timestamp)
+			// write point immediately
+			writeAPI.WritePoint(dataPoint)
 		}
+	} else {
+		log.Warn("There is no Miner status data, an empty datapoint will be sent to Influx.")
 		// create point using full params constructor
 		dataPoint := influxdb2.NewPoint(measurement,
 			tags,
