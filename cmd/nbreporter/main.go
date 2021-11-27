@@ -30,7 +30,11 @@ var optHelp = getopt.BoolLong("help", 0, "Show usage options.")
 
 var token = ""
 
+/*
+	A siries of setup actions to run just before the main login gets executed
+*/
 func init() {
+	// Parsing the option flags
 	getopt.Parse()
 
     if *optHelp {
@@ -38,17 +42,20 @@ func init() {
         os.Exit(0)
     }
 
+	// Checking if shold run in Verbose mode
 	if (*optVerbose) {
 		log.SetLevel(log.DebugLevel)
         log.Warn("Log level set to DEBUG")
 	}
 
+	// Preparing the token for authentication
 	token = *optInfluxToken
 	if *optInfluxUser != "" {
 		log.Debug("Using username as password to authenticate on InfluxDB.")
 		token = fmt.Sprintf("%s:%s",*optInfluxUser, *optInfluxPass)
 	}
 
+	// Runing a the health and version check before starting.
 	healthError := checkInfluxHealth()
 	if healthError != nil {
 		log.Errorf("Health Error: %s", healthError.Error())
@@ -64,13 +71,15 @@ func init() {
 */
 func checkMinerStatus() {
 	log.Printf("Checking Status.")
+	// Prepares the ping var
+	ping := 1 // If Miner status request succeeds, the ping value will be 1
 	// Gets the Miner status data from the endpoint.
 	log.Debug("Running GET request to miner status endpoint")
 	statusData, err := requestGet(fmt.Sprintf("http://%s:%v/api/v1/status", *optNBMinerHost, *optNBMinerPort))
 	if err != nil {
 		log.Error("Something occurred while trying to get status from miner.")
 		log.Error(err)
-		return
+		ping = 0 // If Miner status request fails, the ping value is set to 0
 	}
 	
 	log.Debug("Parsing miner status json")
@@ -79,11 +88,11 @@ func checkMinerStatus() {
 	if err != nil {
 		log.Error("Something occurred while trying to parse status from miner.")
 		log.Error(err)
-		return
+		ping = 0 // If Miner status parse fails, the ping value is set to 0
 	}
 	// Sends the data to InfluxDB
 	log.Debug("Sending data to InfluxDB")
-	writeToInflux(status)
+	writeToInflux(status, ping)
 	log.Debug("Data sent")
 }
 
