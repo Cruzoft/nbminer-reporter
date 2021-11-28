@@ -15,7 +15,7 @@ This app assumes your NBMiner is exposing status data through its REST API. If y
 
 1. Go NBMiner folder.
 1. Open and edit the file you execute to start the miner (the one that has your wallet id in it).
-1. At the end of the line, add the following flag `--api 127.0.0.1`.
+1. At the end of the line, add the following flag `--api 127.0.0.1:8000`.
 
     What this flag does is enabling a REST API that exposes the miner status data, such as temp or hasrates.
 
@@ -167,6 +167,7 @@ NBMiner Reporter has been tested using the following setups:
 
 | NBM Reporter Ver. | NBMiner Vers. | OS                 | InfluxDB             |
 |-------------------|---------------|--------------------|----------------------|
+| v1.1.X            | 39.7 - 40.1   | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
 | v1.0.X            | 39.7 - 40.1   | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
 
 ## Contribute
