@@ -31,7 +31,7 @@ func checkInfluxHealth() (error) {
 */
 func writeToInflux(status minerStatus, ping int) (error) {
 
-	measurement := "   "
+	measurement := "miner-device-status"
 	timestamp := time.Now().Round(time.Duration(*optCheckFrequencyRound) * time.Second)
 	
     // create new client with default option for server url authenticate by token
