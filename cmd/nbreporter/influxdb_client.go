@@ -12,16 +12,25 @@ import (
 	"github.com/influxdata/influxdb-client-go/v2/domain"
 )
 
+/*
+	Checks the connection with the remote InfluxDB and shows the version detected
+*/
 func checkInfluxHealth() (error) {
+	// Creates the influx client
 	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), token)
+	// Runs the healthCheck 
 	health, err := influxClient.Health(context.Background())
+	// Closes the client connection since it won't be used anymore.
+	influxClient.Close()
 	
+	// Checking if any errors occured while running InfluxDB healthCheck
 	if err != nil {
 		log.Error("Couldn't check InfluxDB Health.")
 		return err
 	} 
 	
-	log.Infof("InfluxDB Version: %s", *domain.HealthCheck(*health).Version)
+	// Shows the detected version
+	log.Infof("Detected InfluxDB version: %s", *domain.HealthCheck(*health).Version)
 	return nil
 }
 
@@ -29,28 +38,24 @@ func checkInfluxHealth() (error) {
 	It takes a NBMiner status object, creates an InfluxDB data point
 		and writes it into a remote InfluxDB service.
 */
-func writeToInflux(status minerStatus, ping int) (error) {
+func writeToInflux(timestamp time.Time, status minerStatus, ping int) (error) {
 
 	measurement := "miner-device-status"
-	timestamp := time.Now().Round(time.Duration(*optCheckFrequencyRound) * time.Second)
 	
     // create new client with default option for server url authenticate by token
 	influxClient := influxdb2.NewClient(fmt.Sprintf("%s://%s:%v", *optInfluxProto, *optInfluxHost, *optInfluxPort), token)
     // user blocking write client for writes to desired bucket
-    writeAPI := influxClient.WriteAPI(*optInfluxOrg, *optInfluxBucket)
-	// Get errors channel
-    errorsCh := writeAPI.Errors()
-    // Create go proc for reading and logging errors
-    go func() {
-        for err := range errorsCh {
-            log.Error("Something when wrong while trying to send data to InfluxDB.")
-            log.Errorf("Write error: %s\n", err.Error())
-        }
-    }()
+
+    writeAPI := influxClient.WriteAPIBlocking(*optInfluxOrg, *optInfluxBucket)
+
+	// Creating context for the writing API
+	ctx := context.Background()
 
 	// Create the tags and fields bars to store all the datapoint values
 	tags := map[string]string{"friendlyName": *optFriendlyName}
 	fields := map[string]interface{}{"ping": ping}
+
+	var err error
 	
 	if (ping == 1) {
 		// Common Tags
@@ -118,7 +123,7 @@ func writeToInflux(status minerStatus, ping int) (error) {
 				fields,
 				timestamp)
 			// write point immediately
-			writeAPI.WritePoint(dataPoint)
+			err = writeAPI.WritePoint(ctx, dataPoint)
 		}
 	} else {
 		log.Warn("There is no Miner status data, an empty datapoint will be sent to Influx.")
@@ -128,14 +133,12 @@ func writeToInflux(status minerStatus, ping int) (error) {
 			fields,
 			timestamp)
 		// write point immediately
-		writeAPI.WritePoint(dataPoint)
+		err = writeAPI.WritePoint(ctx, dataPoint)
 	}
 
-    // Force all unwritten data to be sent
-    writeAPI.Flush()
     // Ensures background processes finish
     influxClient.Close()
 
-	// Since everything when will, we return no error
-	return nil
+	// We return no error, which should be nil if everything went well
+	return err
 }

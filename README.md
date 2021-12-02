@@ -158,6 +158,7 @@ Check the options details.
 | -o | --org=string      | InfluxDB Organization.  Default: miner-org           |
 | -r | --nbport=number   | NBMiner API Port. Default: 8000                      |
 | -s | --nbhost=string   | NBMiner API Host. Default: localhost                 |
+| -c | --cache=number    | Cache size. Set to 0 to disable Cache. Default: 60   |
 | -v |                   | Run in Verbose mode. Default: false                  |
 |    | --help            | Show usage options.                                  |
 
