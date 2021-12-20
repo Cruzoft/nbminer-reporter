@@ -154,6 +154,7 @@ func sendDataToInflux() {
 			log.Debug("Writing on InfluxDB")
 			error := writeToInflux(timestamp,datapoint.Status, datapoint.Ping)
 			if error != nil { // Checking for writing errors
+				log.Error("Couldn't write data on InfluxDB.")
 				log.Errorf("Write error: %s\n", error.Error())
 				return
 			}

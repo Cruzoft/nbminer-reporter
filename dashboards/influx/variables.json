@@ -1,0 +1,35 @@
+{
+ "meta": {
+  "version": "1",
+  "type": "variable",
+  "name": "rig-Template",
+  "description": "template created from variable: rig"
+ },
+ "content": {
+  "data": {
+   "type": "variable",
+   "id": "089520461bbda000",
+   "attributes": {
+    "name": "rig",
+    "arguments": {
+     "type": "query",
+     "values": {
+      "query": "import \"influxdata/influxdb/schema\"\n\nschema.tagValues(bucket: \"miner\", tag: \"friendlyName\")",
+      "language": "flux"
+     }
+    },
+    "selected": null
+   },
+   "relationships": {
+    "variable": {
+     "data": []
+    },
+    "label": {
+     "data": []
+    }
+   }
+  },
+  "included": []
+ },
+ "labels": []
+}
