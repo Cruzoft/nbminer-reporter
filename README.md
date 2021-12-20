@@ -138,7 +138,7 @@ influx bucket create --name miner --org miner-org --retention 30d  --token <auth
 Customize the way NBMiner Reporter works by using the following options:
 
 ```bash
-nbreporter [-v] [-b string] [-f number] [-d number] [-h string] [-l string] [-n string] [-o string] [-p number] [-r strinumberng] [-s string] [-t string] [--help]
+nbreporter [-v] [-b string] [-f number] [-d number] [-h string] [-l string] [-n string] [-o string] [-p number] [-r strinumberng] [-s string] [-t string] [-c number] [--help]
 ```
 
 Check the options details.
@@ -162,12 +162,41 @@ Check the options details.
 | -v |                   | Run in Verbose mode. Default: false                  |
 |    | --help            | Show usage options.                                  |
 
+### Command Examples
+
+To run the reporter on local environment, meaning, both the miner and influx are running on the same machine, you can simply run:
+
+```bash
+nbreporter -n rigX
+```
+
+It'll send all the data using *friendlyName* "rigX".
+
+If you have a remote Influx, under HTTPS, and security enable (you need a token to access it), you can run something like:
+
+```bash
+nbreporter -n rigX -h influxdb.my.organization.net -p 443 -l https -t Teojw8a9HHFPN0TR34L
+```
+
+Or, if you want to get data from a miner running on you local network:
+
+```bash
+nbreporter -n rigX -s 192.168.1.13
+```
+
+### Dashboards Examples
+
+Use the InfluxDb and Grafana dashboards examples located at [dashboards](./dashboards) folder.
+
+To use the InfluxDB dashboard, you'll have to import the variable first.
+
 ## Compatibility
 
 NBMiner Reporter has been tested using the following setups:
 
 | NBM Reporter Ver. | NBMiner Vers. | OS                 | InfluxDB             |
 |-------------------|---------------|--------------------|----------------------|
+| v1.2.X            | 39.7 - 40.1   | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
 | v1.1.X            | 39.7 - 40.1   | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
 | v1.0.X            | 39.7 - 40.1   | Windows 10, HiveOS | 1.8.10, 2.0.x, 2.1.x |
 
