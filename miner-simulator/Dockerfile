@@ -21,7 +21,7 @@ FROM builder as binary
 
 COPY ./ /go/src
 
-RUN CGO_ENABLED=0 go build -ldflags="-w -s -X main.buildTime=`date +'%Y-%m-%d_%T'`" -o /go/bin/nbsim ./cmd/simulator/...
+RUN CGO_ENABLED=0 go build -ldflags="-w -s -X main.buildTime=`date +'%Y-%m-%d_%T'`" -o /go/bin/sim ./cmd/simulator/...
 
 FROM binary
 
@@ -40,6 +40,6 @@ COPY --from=alpine /zoneinfo.zip /
 # the tls certificates:
 COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY --from=binary /go/bin/nbsim /go/bin/nbsim
+COPY --from=binary /go/bin/sim /go/bin/sim
 
-ENTRYPOINT ["/go/bin/nbsim"]
+ENTRYPOINT ["/go/bin/sim"]
