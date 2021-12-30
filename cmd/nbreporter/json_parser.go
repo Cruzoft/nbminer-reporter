@@ -9,7 +9,7 @@ import (
 	An struct that represents the JSon object returned by NBMiner Status endpoint
 	Based on NBMiner v39.7
 */
-type minerStatus struct {
+type minerStatusNBminer struct {
 	Miner struct {
 		Devices []struct {
 			AcceptedShares int `json:"accepted_shares"`
@@ -67,14 +67,87 @@ type minerStatus struct {
 	} `json:"stratum"`
 	Version string  `json:"version"`
 }
+/*
+	An struct that represents the JSon object returned by TRex Summary endpoint
+	Based on T-Rex v0.24.8
+*/
+type minerStatusTrex struct {
+	AcceptedCount int `json:"accepted_count"`
+	ActivePool    struct {
+		Difficulty int    `json:"difficulty"`
+		Ping       int    `json:"ping"`
+		Retries    int    `json:"retries"`
+		URL        string `json:"url"`
+		User       string `json:"user"`
+	} `json:"active_pool"`
+	Algorithm   string  `json:"algorithm"`
+	API         string  `json:"api"`
+	Cuda        string  `json:"cuda"`
+	Description string  `json:"description"`
+	Difficulty  float64 `json:"difficulty"`
+	GpuTotal    int     `json:"gpu_total"`
+	Gpus        []struct {
+		DeviceID              int     `json:"device_id"`
+		FanSpeed              int     `json:"fan_speed"`
+		GpuUserID             int     `json:"gpu_user_id"`
+		Hashrate              float64 `json:"hashrate"`
+		HashrateDay           int     `json:"hashrate_day"`
+		HashrateHour          int     `json:"hashrate_hour"`
+		HashrateMinute        int     `json:"hashrate_minute"`
+		Intensity             float64 `json:"intensity"`
+		Name                  string  `json:"name"`
+		Temperature           int     `json:"temperature"`
+		Vendor                string  `json:"vendor"`
+		Disabled              bool    `json:"disabled"`
+		DisabledAtTemperature int     `json:"disabled_at_temperature"`
+		Shares                struct {
+			AcceptedCount int `json:"accepted_count"`
+			InvalidCount  int `json:"invalid_count"`
+			RejectedCount int `json:"rejected_count"`
+			SolvedCount   int `json:"solved_count"`
+		} `json:"shares"`
+	} `json:"gpus"`
+	Hashrate       float64 `json:"hashrate"`
+	HashrateDay    int     `json:"hashrate_day"`
+	HashrateHour   int     `json:"hashrate_hour"`
+	HashrateMinute int     `json:"hashrate_minute"`
+	Name           string  `json:"name"`
+	Os             string  `json:"os"`
+	RejectedCount  int     `json:"rejected_count"`
+	SolvedCount    int     `json:"solved_count"`
+	Ts             int     `json:"ts"`
+	Uptime         int     `json:"uptime"`
+	Version        string  `json:"version"`
+	Updates        struct {
+		URL            string `json:"url"`
+		Md5Sum         string `json:"md5sum"`
+		Version        string `json:"version"`
+		NotesFull      string `json:"notes_full"`
+		DownloadStatus struct {
+			DownloadedBytes  int     `json:"downloaded_bytes"`
+			TotalBytes       int     `json:"total_bytes"`
+			LastError        string  `json:"last_error"`
+			TimeElapsedSec   float64 `json:"time_elapsed_sec"`
+			UpdateInProgress bool    `json:"update_in_progress"`
+			UpdateState      string  `json:"update_state"`
+			URL              string  `json:"url"`
+		} `json:"download_status"`
+	} `json:"updates"`
+}
 
 /*
 	Parses the json string returned by NBMiner status endpoint into a struct object
 */
-func parseStatus(statusData []byte) (minerStatus, error) {
+func parseStatus (statusData []byte) (interface{}, error) {
 
-	var status minerStatus
-
+	var status interface{}
+	
+	switch minerName {
+	case "trex":
+		status = &minerStatusTrex{}
+	default:
+		status = &minerStatusNBminer{}
+	}
 	// Tries to unmarshal the Json data into a struct object
 	//   if an error occurs, it returns nil and the error message
 	if err := json.Unmarshal(statusData, &status); err != nil {

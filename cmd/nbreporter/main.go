@@ -14,8 +14,8 @@ import (
 
 var hostname, _ = os.Hostname()
 var optFriendlyName = getopt.StringLong("name", 'n', hostname, "A friendly name for miner. \nDefault: hostname", "string")
-var optNBMinerHost = getopt.StringLong("nbhost", 's', "localhost", "NBMiner API Host. \nDefault: localhost", "string")
-var optNBMinerPort = getopt.IntLong("nbport", 'r', 8000, "NBMiner API Port. \nDefault: 8000", "strinumberng")
+var optMinerHost = getopt.StringLong("nbhost", 's', "localhost", "Miner API Host. \nDefault: localhost", "string")
+var optMinerPort = getopt.IntLong("nbport", 'r', 8000, "Miner API Port. \nDefault: 8000", "strinumberng")
 var optInfluxProto = getopt.StringLong("iproto", 'l', "http", "InfluxDB Protocol. \nDefault: http", "string")
 var optInfluxHost = getopt.StringLong("ihost", 'h', "localhost", "InfluxDB Host. \nDefault: localhost", "string")
 var optInfluxPort = getopt.IntLong("iport", 'p', 8086, "InfluxDB Port. \nDefault: 8086", "number")
@@ -26,16 +26,19 @@ var optInfluxOrg = getopt.StringLong("org", 'o', "miner-org", "InfluxDB Organiza
 var optInfluxBucket = getopt.StringLong("bucket", 'b', "miner", "InfluxDB Bucket. \nDefault: miner", "string")
 var optCheckFrequency = getopt.IntLong("freq", 'f', 60, "Status check frequency in seconds.\nDefault: 60", "number")
 var optCheckFrequencyRound = getopt.IntLong("round", 'd', 1, "Round up the status timestamp seconds.\nDefault: 1", "number")
+var optTrex = getopt.BoolLong("trex", 0, "Check TRex Miner '/summary' endpoint instead of nbminer's. \nDefault: false")
 var optCache = getopt.IntLong("cache", 'c', 60, "Cache size. Set to 0 to disable Cache.\nDefault: 60", "number")
 var optVerbose = getopt.Bool('v', "Run in Verbose mode. \nDefault: false", "string")
 var optHelp = getopt.BoolLong("help", 0, "Show usage options.")
 
 var token = ""
+var minerName = "nbminer"
+var minerStatusURL = ""
 
 var localCache *cache.Cache
 
 type cacheItem struct {
-	Status minerStatus
+	Status interface{}
 	Ping int
 }
 
@@ -57,6 +60,15 @@ func init() {
         log.Warn("Log level set to DEBUG")
 	}
 
+	// Preparing the miner status URL
+	if (*optTrex) {
+		log.Debug("TRex option detected, will check '\\summary' endpoint.")
+		minerStatusURL = fmt.Sprintf("http://%s:%v/summary", *optMinerHost, *optMinerPort)
+		minerName = "trex"
+	} else {
+		minerStatusURL = fmt.Sprintf("http://%s:%v/api/v1/status", *optMinerHost, *optMinerPort)
+	}
+
 	// Preparing the token for authentication
 	token = *optInfluxToken
 	if *optInfluxUser != "" {
@@ -74,7 +86,7 @@ func init() {
 	}
 }
 /*
-	It does a GET request to NBMiner status endpoint, then parses the response body Json to a Struct object
+	It does a GET request to Miner status endpoint, then parses the response body Json to a Struct object
 	and finally it adds it to the local cache, or, if cache is dissabled, it sends the data to InfluxDB
 
 	If anything goes wrong, it's raise an error on the console output, but the process won't stop.
@@ -86,7 +98,7 @@ func checkMinerStatus() {
 	ping := 1 // If Miner status request succeeds, the ping value will be 1
 	// Gets the Miner status data from the endpoint.
 	log.Debug("Running GET request to miner status endpoint")
-	statusData, err := requestGet(fmt.Sprintf("http://%s:%v/api/v1/status", *optNBMinerHost, *optNBMinerPort))
+	statusData, err := requestGet(minerStatusURL)
 	if err != nil {
 		log.Error("Something occurred while trying to get status from miner.")
 		log.Error(err)
@@ -208,7 +220,7 @@ func scheduleFunction(function func()) *time.Ticker {
 	// Creating the ticker
 	ticker := time.NewTicker(time.Second * time.Duration(*optCheckFrequency))
 	
-	// Running initial Check
+	// Calling function before starting the loop
 	function()
 
 	// Creating go proc to run the function loop
@@ -222,7 +234,7 @@ func scheduleFunction(function func()) *time.Ticker {
 }
 
 func main() {
-    log.Printf("NBMiner Status Reporter Initiated")
+    log.Printf("Miner Status Reporter Initiated")
     log.Printf("Using Friendly Name: %s", *optFriendlyName)
 
 	// Starting running loops
