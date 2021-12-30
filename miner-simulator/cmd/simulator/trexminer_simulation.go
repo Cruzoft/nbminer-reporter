@@ -48,6 +48,7 @@ func simulateTRexMinerHandler (w http.ResponseWriter, req *http.Request) {
 			  "invalid_count": 0,
 			  "rejected_count": 0,
 			  "solved_count": 0
+		  	}
 		  },
 		  {
 			"device_id": 1,                        
@@ -68,8 +69,9 @@ func simulateTRexMinerHandler (w http.ResponseWriter, req *http.Request) {
 				"invalid_count": 0,
 				"rejected_count": 0,
 				"solved_count": 0
+				}
 			}
-		}],
+		],
 		"hashrate": %f,                       
 		"hashrate_day": 5023728,                   
 		"hashrate_hour": 0,                        

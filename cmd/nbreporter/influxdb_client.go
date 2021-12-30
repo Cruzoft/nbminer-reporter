@@ -59,13 +59,47 @@ func writeToInflux(timestamp time.Time, statusRaw interface{}, ping int) (error)
 	
 	if (ping == 1) {
 		switch minerName {
+		case "trex":
+			status, casted := statusRaw.(*minerStatusTrex)
+			if !casted {
+				return fmt.Errorf("Miner status couldn't be casted into TRex Miner status struct: %v", statusRaw)
+			}
+			// Common Tags
+			tags["user"] = status.Name
+			// Common Fields
+			fields["total_hashrate_raw"] = status.Hashrate
+			fields["accepted_shares"] = status.AcceptedCount
+			fields["start_time"] = status.Ts
+			fields["version"] = status.Version
+
+			for _, device := range status.Gpus {
+				// Device Tags
+				tags["id"] = strconv.Itoa(device.DeviceID)
+				tags["pci_bus_id"] = strconv.Itoa(device.GpuUserID)
+				tags["info"] = device.Name
+		
+				// Device Fields
+				fields["device_accepted_shares"] = device.Shares.AcceptedCount
+				fields["device_invalid_shares"] = device.Shares.InvalidCount
+				fields["device_rejected_shares"] = device.Shares.RejectedCount
+				fields["fan"] = device.FanSpeed
+				fields["hashrate_raw"] = device.Hashrate
+				fields["temperature"] = device.Temperature
+				fields["power"] = 0
+				//// create point using full params constructor
+				//dataPoint := influxdb2.NewPoint(measurement,
+				//	tags,
+				//	fields,
+				//	timestamp)
+				//// write point immediately
+				//err = writeAPI.WritePoint(ctx, dataPoint)
+			}
 		default:
 			status, casted := statusRaw.(*minerStatusNBminer)
 			if !casted {
 				return fmt.Errorf("Miner status couldn't be casted into NBMiner status struct: %v", statusRaw)
 			}
 			// Common Tags
-			tags["friendlyName"] = *optFriendlyName	
 			tags["user"] = status.Stratum.User[strings.LastIndex(status.Stratum.User, ".")+1:] // We don't want to store any wallet addresses 
 			tags["user2"] = status.Stratum.User2[strings.LastIndex(status.Stratum.User2, ".")+1:] // We don't want to store any wallet addresses 
 			// Common Fields

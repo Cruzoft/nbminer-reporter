@@ -32,7 +32,7 @@ var optVerbose = getopt.Bool('v', "Run in Verbose mode. \nDefault: false", "stri
 var optHelp = getopt.BoolLong("help", 0, "Show usage options.")
 
 var token = ""
-var minerName = "nbminer"
+var minerName = ""
 var minerStatusURL = ""
 
 var localCache *cache.Cache
@@ -67,6 +67,7 @@ func init() {
 		minerName = "trex"
 	} else {
 		minerStatusURL = fmt.Sprintf("http://%s:%v/api/v1/status", *optMinerHost, *optMinerPort)
+		minerName = "nbminer"
 	}
 
 	// Preparing the token for authentication
